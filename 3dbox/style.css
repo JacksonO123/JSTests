@@ -1,0 +1,144 @@
+:root {
+	--size: 250px;
+	--perspective: 900px;
+	--primary: #007bff;
+}
+
+* {
+	padding: 0;
+	margin: 0;
+	font-family: sans-serif;
+	box-sizing: border-box;
+}
+
+body {
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: calc(var(--size) + 100px);
+	perspective: var(--perspective);
+	overflow: hidden;
+}
+
+three-box {
+	transform-style: preserve-3d;
+    transform-origin: 125px 125px -125px;
+	width: var(--size);
+	aspect-ratio: 1;
+}
+
+.rotating {
+	animation: 4s rotate linear infinite;
+}
+
+.toggle-wrapper {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+}
+
+.toggle-btn {
+	background: white;
+	border: 1px solid var(--primary);
+	border-radius: 4px;
+	position: relative;
+	transition: 0.25s;
+	cursor: pointer;
+	padding: 8px 16px;
+	z-index: 1;
+}
+
+.toggle-btn:hover {
+	color: white;
+}
+
+.toggle-btn::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	transition: 0.25s ease-in-out;
+	background: var(--primary);
+	transform-origin: left;
+	transform: scaleX(0);
+	z-index: -1;
+}
+
+.toggle-btn:hover::before {
+	transform: scaleX(1);
+}
+
+.front {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: var(--size);
+	aspect-ratio: 1;
+	background: var(--primary);
+}
+
+.back {
+	position: absolute;
+	top: 0;
+	left: 0;
+	transform: translateZ(calc(var(--size) * -1));
+	width: var(--size);
+	aspect-ratio: 1;
+	background: #2ecc71;
+}
+
+.left {
+	position: absolute;
+	top: 0;
+	left: 0;
+	transform-origin: right;
+	transform: rotateY(-90deg);
+	width: var(--size);
+	aspect-ratio: 1;
+	background: #dc3545;
+}
+
+.right {
+	position: absolute;
+	top: 0;
+	left: 0;
+	transform-origin: left;
+	transform: rotateY(90deg);
+	width: var(--size);
+	aspect-ratio: 1;
+	background: #ffc107;
+}
+
+.top {
+	position: absolute;
+	top: 0;
+	left: 0;
+	transform-origin: bottom;
+	transform: rotateX(90deg);
+	width: var(--size);
+	aspect-ratio: 1;
+	background: #17a2b8;
+}
+
+.bottom {
+	position: absolute;
+	top: 0;
+	left: 0;
+	transform-origin: top;
+	transform: rotateX(-90deg);
+	width: var(--size);
+	aspect-ratio: 1;
+	background: #d64cc4;
+}
+
+@keyframes rotate {
+	from {
+		transform: rotateX(0deg) rotateY(0deg);
+	}
+	to {
+		transform: rotateX(360deg) rotateY(360deg);
+	}
+}
