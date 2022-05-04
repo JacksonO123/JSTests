@@ -36,7 +36,8 @@ const get = (id) => {
 customElements.define('three-box', ThreeBox);
 
 function toggleRotate() {
-	document.getElementById('3d-box').classList.toggle('rotating');
+	const box = document.getElementById('3d-box');
+	box.classList.toggle('rotating');
 }
 
 const perspective = +getComputedStyle(document.body).getPropertyValue('--perspective').match(/(\d+)/g)[0];

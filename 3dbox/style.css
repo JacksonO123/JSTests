@@ -2,6 +2,8 @@
 	--size: 250px;
 	--perspective: 900px;
 	--primary: #007bff;
+	--speed: 4s;
+	--centerSpeed: 2s;
 }
 
 * {
@@ -29,7 +31,7 @@ three-box {
 }
 
 .rotating {
-	animation: 4s rotate linear infinite;
+	animation: var(--speed) rotate linear infinite;
 }
 
 .toggle-wrapper {
