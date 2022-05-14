@@ -1,0 +1,58 @@
+:root {
+	--padding: 8px;
+	--mainColor: black;
+	--secondColor: white;
+	--mainBg: white;
+	--secondBg: purple;
+}
+
+* {
+	padding: 0;
+	margin: 0;
+	font-family: sans-serif;
+	box-sizing: border-box;
+}
+
+body {
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+bubble-body {
+	width: 375px;
+	height: fit-content;
+	position: relative;
+	cursor: pointer;
+}
+
+bubble-main, bubble-second{
+	padding: var(--padding);
+	border-radius: 8px;
+	overflow: hidden;
+	display: flex;
+}
+
+bubble-main {
+	color: var(--mainColor);
+	background: var(--mainBg);
+}
+
+bubble-second {
+	color: var(--secondColor);
+	background: var(--secondBg);
+	box-shadow: 0 0 12px var(--secondBg);
+}
+
+bubble-second {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	transition: clip-path 1.25s ease;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
