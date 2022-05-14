@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <title>3d cards</title>
+    <style>
+      *{
+        padding: 0;
+        margin: 0;
+        font-family: sans-serif;
+        box-sizing: border-box;
+      }
+      body{
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .card-wrapper{
+        height: var(--height);
+        width: var(--width);
+        max-height: var(--height);
+        max-width: var(--width);
+        perspective: 400px;
+        z-index: 2;
+        background: transparent;
+        cursor: pointer;
+        margin: 10px;
+        transition: 0.2s;
+        user-select: none;
+      }
+      .card{
+        width: 100%;
+        height: 100%;
+        border-radius: 10px;
+        transform-style: preserve-3d;
+        z-index: initial;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+      }
+      .card img{
+        height: 100%;
+        width: auto;
+      }
+      .card .content{
+        display: flex;
+        z-index: 5;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .overview{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0);
+      }
+      .content{
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        width: calc(100% - 10px);
+        height: calc(100% - 10px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card-wrapper">
+      <div class="card">
+        <img src="https://cdn.pixabay.com/photo/2018/03/27/14/37/design-3266151_960_720.png">
+				<!-- insert div content class to put content in the cards -->
+      </div>
+    </div>
+    <div class="card-wrapper">
+      <div class="card">
+        <img src="https://cdn.pixabay.com/photo/2018/03/27/14/37/design-3266151_960_720.png">
+      </div>
+    </div>
+    <div class="card-wrapper">
+      <div class="card">
+        <img src="https://cdn.pixabay.com/photo/2018/03/27/14/37/design-3266151_960_720.png">
+      </div>
+    </div>
+    <div class="card-wrapper">
+      <div class="card">
+        <img src="https://cdn.pixabay.com/photo/2018/03/27/14/37/design-3266151_960_720.png">
+      </div>
+    </div>
+    <script>
+      let height = 250;
+      let width = 200;
+      let maxDegX = 35;
+      let maxDegY = 25;
+      let transformX = '';
+      let transformY = '';
+      let scale = 1.2;
+      document.documentElement.style.setProperty('--height', `${height}px`);
+      document.documentElement.style.setProperty('--width', `${width}px`);
+      function get(id){
+        return document.getElementById(id);
+      }
+      let cards = document.querySelectorAll('.card-wrapper');
+      cards.forEach(card => {
+        card.addEventListener('mousemove', e => {
+          let x = e.offsetX;
+          x -= width/2;
+          let y = e.offsetY;
+          y -= height/2;
+          let tiltX = (x/(width/2)) * maxDegX;
+          let tiltY = (y/(height/2)) * -maxDegY;
+          transformX = `rotateY(${tiltX}deg)`;
+          transformY = `rotateX(${tiltY}deg)`;
+          card.children[0].style.transform = `${transformX} ${transformY}`;
+          let brightness = (y/(width/2)*-1)/2 + 0.8;
+          console.log(brightness);
+          card.children[0].style.filter = `brightness(${brightness})`;
+          card.style.transform = `scale(${scale})`;
+          card.style.zIndex = '10';
+        });
+      });
+      cards.forEach(card => {
+        card.addEventListener('mouseleave', () => {
+          card.children[0].style.transition = '0.2s ease-in-out';
+          card.children[0].style.transform = `rotateY(0deg) rotateX(0deg)`;
+          card.style.transform = `scale(1)`;
+          card.style.zIndex = '2';
+          card.children[0].style.filter = 'brightness(1)';
+          setTimeout(() => {
+            card.children[0].style.transition = '0s';
+            scaled = false;
+          }, 500);
+        });
+      });
+    </script>
+  </body>
+</html>
