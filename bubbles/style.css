@@ -42,7 +42,7 @@ bubble-main {
 bubble-second {
 	color: var(--secondColor);
 	background: var(--secondBg);
-	box-shadow: 0 0 12px var(--secondBg);
+	box-shadow: 0 0 24px -8px var(--secondBg);
 }
 
 bubble-second {
