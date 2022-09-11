@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>node map</title>
+        <style>
+            *{
+                padding: 0;
+                margin: 0;
+                font-family: sans-serif;
+                box-sizing: border-box;
+            }
+            body{
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+			#range{
+				width: 200px;
+			}
+            .controls{
+				position: absolute;
+				top: 10px;
+				left: 10px;
+                display: flex;
+                flex-direction: row;
+            }
+            .controls button{
+                margin-left: 10px;
+            }
+            #arrow{
+                display: none;
+            }
+            #arrow button{
+                background: rgba(180, 180, 180, 0.4);
+                border-radius: 6px;
+                padding: 8px;
+                border: none;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+		<div class="controls" id="controls">
+            <input type="range" oninput="setNewNodeNums()" id="range" min="1" max="150" value="40" />
+            <button onclick="toggleColors()">Toggle colors</button>
+            <button onclick="toggleCrazyMode()">Toggle crazy mode</button>
+            <button onclick="toggleHidingControls()">Toggle controls</button>
+        </div>
+        <div class="controls" id="arrow">
+            <button onclick="toggleHidingControls()">></button>
+        </div>
+        <canvas id="canvas"></canvas>
+        <script>
+            let c = document.getElementById('canvas');
+            let ctx = c.getContext('2d');
+ 
+            let nodeList = [];
+            let numNodes = 40;
+            let canvasSize = 800;
+            let clearDistanceInterval = 15;
+            let frameRate = 60
+            let colors = ['#1abc9c', '#2ecc71', '#3498db', '#8e44ad', '#f1c40f', '#e67e22', '#e74c3c'];
+            let showColors = false;
+            let crazyMode = false;
+            let hidingControls = false;
+ 
+            function resizeWindow(){
+                c.width = window.innerWidth;
+                c.height = window.innerHeight;
+                ctx.lineWidth = 3;
+            }
+ 
+            window.addEventListener('resize', () => {
+                resizeWindow();
+                console.log(c.height);
+                console.log(c.width);
+            });
+            resizeWindow();
+ 
+            class Node{
+                constructor(x, y){
+                    this.x = x;
+                    this.y = y;
+                    this.setNewPos();
+                    this.setNewSlope();
+                    this.setNewSpeed();
+                    this.setColor();
+                }
+ 
+                getX(){
+                    return this.x;
+                }
+ 
+                getY(){
+                    return this.y;
+                }
+ 
+                setRandomCoords(){
+                    this.x = Math.floor(Math.random()*c.width);
+                    this.y = Math.floor(Math.random()*c.height);
+                }
+ 
+                setX(newX){
+                    this.x = newX;
+                }
+ 
+                setY(newY){
+                    this.y = newY;
+                }
+ 
+                getCurrentPos(){
+                    return {x: this.getX(), y: this.getY()};
+                }
+ 
+                getNewPos(){
+                    return {x: this.goingToX, y: this.goingToY};
+                }
+ 
+                setNewPos(){
+                    this.goingToX = Math.floor(Math.random()*c.width);
+                    this.goingToY = Math.floor(Math.random()*c.height);
+                }
+ 
+                movePos(){
+                    this.y += this.rise/(frameRate/this.speed);
+                    this.x += this.run/(frameRate/this.speed);
+ 
+                    if(distance(this.x, this.y, this.goingToX, this.goingToY) < 6){
+                        this.setNewSpeed();
+                        this.setNewPos();
+                        this.setNewSlope();
+                    }
+                }
+ 
+                setNewSpeed(){
+                    this.speed = Math.floor(Math.random()*0.7)+0.1;
+                }
+ 
+                setNewSlope(){
+                    this.rise = (this.goingToY - this.y);
+                    this.run = (this.goingToX - this.x);
+                    this.setColor();
+                }
+                
+                setColor(){
+                    this.color = colors[Math.floor(Math.random()*colors.length)];
+                }
+
+                getColor(){
+                    return this.color;
+                }
+            }
+ 
+            for(let i = 0; i < numNodes; i++){
+                nodeList.push(new Node(Math.floor(Math.random()*c.width), Math.floor(Math.random()*c.height)));
+            }
+ 
+            function render(){
+                ctx.clearRect(0, 0, c.width, c.height);
+                ctx.strokeStyle = '';
+                nodeList.forEach(item => {
+                    ctx.beginPath();
+                    let dotColor = hexToRgb(item.getColor());
+                    dotColor = `rgba(${dotColor.r}, ${dotColor.g}, ${dotColor.b}, 1)`;
+                    showColors ? ctx.strokeStyle = dotColor : ctx.strokeStyle = 'rgba(150, 150, 150, 1)';
+                    ctx.arc(item.getX(), item.getY(), 4, 0, 360);
+                    showColors ? ctx.fillStyle = dotColor : ctx.fillStyle = 'rgba(150, 150, 150, 1)';
+                    ctx.fill();
+                    ctx.stroke();
+                });
+                ctx.strokeStyle = '';
+                for(let i = 0; i < nodeList.length; i++){
+                    for(let j = 0; j < nodeList.length; j++){
+                        let distanceToNode = distance(nodeList[i].getX(), nodeList[i].getY(), nodeList[j].getX(), nodeList[j].getY());
+                        if(distanceToNode < canvasSize/3){
+                            ctx.beginPath();
+                            ctx.moveTo(nodeList[i].getX(), nodeList[i].getY());
+                            ctx.lineTo(nodeList[j].getX(), nodeList[j].getY());
+                            let opacity = -Math.log10(distanceToNode) + 2.4;
+                            opacity = opacity > 1 ? 1 : opacity;
+                            let color1Obj = hexToRgb(nodeList[i].getColor());
+                            let color2Obj = hexToRgb(nodeList[j].getColor());
+                            let color1 = `rgba(${color1Obj.r}, ${color1Obj.g}, ${color1Obj.b}, ${opacity})`;
+                            let color2 = `rgba(${color2Obj.r}, ${color2Obj.g}, ${color2Obj.b}, ${opacity})`;
+                            let gradient = ctx.createLinearGradient(nodeList[i].getX(), nodeList[i].getY(), distanceToNode, 3);
+                            gradient.addColorStop(0, color1);
+                            gradient.addColorStop(1, color2);
+                            showColors ? ctx.strokeStyle = gradient : ctx.strokeStyle = `rgba(150, 150, 150, ${opacity})`;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+ 
+            function distance(x1, y1, x2, y2){
+                return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+            }
+
+            function hexToRgb(hex) {
+                var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            }
+ 
+            function moveNodes(){
+                setTimeout(() => {
+                    nodeList.forEach(item =>{
+                        if(item.getCurrentPos() != item.getNewPos()){
+                            item.movePos();
+                        }
+                    });
+                    render();
+                    moveNodes();
+                }, 1000/frameRate);
+            }
+
+            function toggleColors(){
+                showColors = !showColors;
+            }
+
+			function setNewNodeNums(){
+				let newNums = parseInt(document.getElementById('range').value);
+				while(newNums < nodeList.length){
+					nodeList.pop();
+				}
+				while(newNums > nodeList.length){
+                	nodeList.push(new Node(Math.floor(Math.random()*c.width), Math.floor(Math.random()*c.height)));
+				}
+				numNodes = newNums;
+			}
+
+            function toggleCrazyMode(){
+                let range = document.getElementById('range');
+                crazyMode = !crazyMode;
+                if(crazyMode){
+                    range.max = 1000;
+                }else{
+                    range.max = 150;
+                    if(numNodes > range.max){
+                        range.value = range.max;
+                        setNewNodeNums();
+                    }
+                }
+            }
+
+            function toggleHidingControls(){
+                hidingControls = !hidingControls;
+                let controls = document.getElementById('controls');
+                let arrow = document.getElementById('arrow');
+                if(hidingControls){
+                    controls.style.display = 'none';
+                    arrow.style.display = 'flex';
+                }else{
+                    arrow.style.display = 'none';
+                    controls.style.display = 'flex';
+                }
+            }
+ 
+            render();
+            moveNodes();
+        </script>
+    </body>
+</html>
